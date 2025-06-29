@@ -1,0 +1,132 @@
+#!/bin/bash
+#
+# alsa_volume: generic alsa volume control for waybar
+#
+# author: zentoo @zentoo.org
+# license: GNU GPL3
+#
+# version: 20250629
+#
+# 20250628 Initial release
+# 20250629 command set VALUE
+#
+script_name="$(basename $0)"
+usage() {
+  echo "$script_name [OPTION]... volume-up [INC]|volume-down [INC]|mute|unmute|toggle"
+  echo "$script_name [OPTION]... on|off|toggle|set VALUE|waybar-exec"
+  echo "$script_name [OPTION]... list-cards|list-devices|list-controls"
+  echo
+  echo "Options:"
+  echo " -c card      Select the alsa card by number or name"
+  echo "                List: /proc/asound/cards - Ex: 2|NVidia|PCH|Device"
+  echo " -D device    Select the alsa device instead of the default one"
+  echo "                List: aplay -L - Ex: hdmi:CARD=NVidia,DEV=0 "
+  echo " -C control   Select the mixer control. Default to Master"
+  echo "                List: amixer scontrols - Ex: Mic|Line|Aux"
+  echo " -n           Make waybar text start with a new line"
+  echo
+  echo "Commands:"
+  echo " volume-up INC   Raise the volume with optional INC"
+  echo " volume-down INC Decrease the volume with optional INCof INC"
+  echo "                 INC set the volume step: [0-9]% or [0-9]dB (default to 2%)"
+  echo " mute|off        Mute or set to off"
+  echo " unmute|on       Unmute or set to on"
+  echo " toggle          Toggle mute|unmute or on|off"
+  echo " set VALUE       Set control to VALUE"
+  echo " waybar-exec     To use for exec command of a waybar custom module"
+  echo
+  echo "List commands:"
+  echo " list-cards    list number/name of alsa cards that can be used with -c option"
+  echo " list-devices  list alsa devices that can be used with -D option"
+  echo " list-controls list alsa controls that can be used with -C option"
+  echo
+  echo "Examples:"
+  echo " $script_name list-controls"
+  echo " $script_name volume-up 2dB"
+  echo " $script_name -c STX -C Mic mute"
+  echo " $script_name -C 'Mic Boost (+20dB)' toggle"
+  echo " $script_name -C Analog Output' set Headphones"
+}
+
+list_controls() {
+  amixer $amixer_opts scontrols | grep -o "'.*'" | while read control; do
+    out="$control\n └─"
+    capabilities="$(amixer $amixer_opts sget "$control" | grep -w "Capabilities:")"
+    if grep -qw '[cp]volume' <<< "$capabilities" ; then
+      out+=' [up] [down]'
+      if grep -qw '[cp]switch' <<< "$capabilities"; then
+        out+=' [mute] [unmute] [toggle]'
+      fi
+    elif grep -qw '[cp]switch' <<< "$capabilities" ; then
+      out+=' [on] [off] [toggle]'
+    elif grep -qwE 'enum|[cp]enum' <<< "$capabilities" ; then
+      out+=' [set]\n   └─ '
+      out+="$(amixer $amixer_opts sget "$control" | grep -w 'Items:' | cut -d: -f2)"
+    fi
+    echo -e "$out\n"
+  done
+}
+
+print_waybar_json()
+{
+  master="$(amixer $amixer_opts sget "$control"| tail -1)"
+  percentage="$(grep -o "[0-9]*%" <<< "$master")"
+  if grep -q "\[off\]$" <<< "$master" ; then
+    text=""
+    alt="muted"
+    class="muted"
+  else
+    $text_newline && text="\n$percentage" || text="$percentage"
+    alt="default"
+    class="default"
+  fi
+  tooltip="$text"
+  echo "{\"text\": \"$text\", \"alt\": \"$alt\", \"tooltip\": \"$text\", \"class\": \"$class\", \"percentage\": ${percentage%\%} }"
+}
+
+waybar_loop() {
+  local dummy
+  print_waybar_json
+  alsactl monitor | while read dummy ; do
+    print_waybar_json
+  done
+}
+
+# Main
+amixer_opts="-M"
+control="Master"
+volume_step="2%"
+text_newline=false
+
+while getopts "c:D:C:i:nh" opt ; do
+  case "$opt" in
+    c) amixer_opts+=" -c $OPTARG";;
+    D) amixer_opts+=" -D $OPTARG";;
+    C) control="$OPTARG";;
+    i) increment="$OPTARG";;
+    n) text_newline=true;;
+    h) usage ; exit 0 ;;
+    ?) echo "$script_name: invalid option -$opt"
+       echo "Try '$script_name -h' for more information."
+       exit 1 ;;
+  esac
+done
+shift "$(($OPTIND -1))"
+command="$1"
+value="$2"
+
+case $command in
+  volume-up)     [ ! -z "$2" ] && volume_step="$2"
+                 amixer -q $amixer_opts sset "$control" $volume_step+ ;;
+  volume-down)   [ ! -z "$2" ] && volume_step="$2"
+                 amixer -q $amixer_opts sset "$control" $volume_step- ;;
+  mute|on)       amixer -q $amixer_opts sset "$control" off ;;
+  unmute|off)    amixer -q $amixer_opts sset "$control" on ;;
+  toggle)        amixer -q $amixer_opts sset "$control" toggle ;;
+  set)           amixer -q $amixer_opts sset "$control" "$2" ;;
+  waybar-exec)   waybar_loop ;;
+  list-cards)    grep : /proc/asound/cards | cut -d: -f1 ;;
+  list-devices)  aplay -L ;;
+  list-controls) list_controls ;;
+  *)             usage ; exit 1 ;;
+esac
