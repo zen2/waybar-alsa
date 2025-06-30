@@ -87,8 +87,8 @@ print_waybar_json()
     class="muted"
     tooltip="$control muted"
   else
-    $text_newline && text="\n" || text=""
-    $use_db_level && text+="$db_level" || text="$percentage"
+    $use_newline && text="\n" || text=""
+    $use_db_level && text+="$db_level" || text+="$percentage"
     alt="default"
     class="default"
     tooltip="$control $percentage $db_level"
@@ -108,7 +108,7 @@ waybar_loop() {
 amixer_opts="-M"
 control="Master"
 volume_step="2%"
-text_newline=false
+use_newline=false
 use_db_level=false
 
 while getopts "c:D:C:i:ndh" opt ; do
@@ -117,7 +117,7 @@ while getopts "c:D:C:i:ndh" opt ; do
     D) amixer_opts+=" -D $OPTARG";;
     C) control="$OPTARG";;
     i) increment="$OPTARG";;
-    n) text_newline=true;;
+    n) use_newline=true;;
     d) use_db_level=true;;
     h) usage ; exit 0 ;;
     ?) echo "$script_name: invalid option -$opt"
