@@ -1,4 +1,4 @@
-    "custom/sound": {
+    "custom/alsa-master": {
        "exec": "$HOME/.config/waybar/scripts/alsa -n waybar-exec",
        "exec-on-event": false,
        "return-type": "json",
