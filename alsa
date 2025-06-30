@@ -30,7 +30,7 @@ usage() {
   echo
   echo "Waybar options:"
   echo " -n           Make waybar text start with a new line if not muted"
-  echo " -d           Use db level insteaf of percentage for text"
+  echo " -d           Use db level instead of percentage for text"
   echo
   echo "Commands:"
   echo " volume-up INC   Raise the volume with optional INC"
