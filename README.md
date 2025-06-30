@@ -1,6 +1,12 @@
 # waybar-alsa
 waybar custom module to control alsa devices
 
+![Image](https://github.com/user-attachments/assets/b91b333f-7bc1-4a9c-ab2b-6cc1aac7fab4)
+
+![Image](https://github.com/user-attachments/assets/ab43e9af-2dc0-4c4d-b467-17119d666f47)
+
+![Image](https://github.com/user-attachments/assets/5b2885b9-df53-4f0a-9ea0-326e05f9d28e)
+
 ## alsa helper
 
 Download the alsa helper that will be used by waybar custom modules using git clone or wget.
