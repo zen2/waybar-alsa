@@ -19,7 +19,7 @@ usage() {
   echo
   echo "Alsa options:"
   echo " -c card      Select the alsa card by number or name"
-  echo "                List: $script_name list-cards
+  echo "                List: $script_name list-cards"
   echo "                Ex:   2|NVidia|PCH|Device" 
   echo " -D device    Select the alsa device instead of the default one"
   echo "                List: $script_name list-devices"
