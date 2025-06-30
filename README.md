@@ -30,7 +30,7 @@ Alsa options:
 
 Waybar options:
  -n           Make waybar text start with a new line if not muted
- -d           Use db level insteaf of percentage for text
+ -d           Use db level instead of percentage for text
 
 Commands:
  volume-up INC   Raise the volume with optional INC
