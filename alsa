@@ -9,7 +9,7 @@
 #
 # 20250628 initial release
 # 20250629 command set VALUE
-# 20250630 waybar option db level
+# 20250630 db level option, tooltip, loop optimization
 #
 script_name="$(basename $0)"
 usage() {
