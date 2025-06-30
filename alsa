@@ -7,8 +7,9 @@
 #
 # version: 20250629
 #
-# 20250628 Initial release
+# 20250628 initial release
 # 20250629 command set VALUE
+# 20250630 waybar option db level
 #
 script_name="$(basename $0)"
 usage() {
@@ -16,14 +17,17 @@ usage() {
   echo "$script_name [OPTION]... on|off|toggle|set VALUE|waybar-exec"
   echo "$script_name [OPTION]... list-cards|list-devices|list-controls"
   echo
-  echo "Options:"
+  echo "Alsa options:"
   echo " -c card      Select the alsa card by number or name"
   echo "                List: /proc/asound/cards - Ex: 2|NVidia|PCH|Device"
   echo " -D device    Select the alsa device instead of the default one"
   echo "                List: aplay -L - Ex: hdmi:CARD=NVidia,DEV=0 "
   echo " -C control   Select the mixer control. Default to Master"
   echo "                List: amixer scontrols - Ex: Mic|Line|Aux"
-  echo " -n           Make waybar text start with a new line"
+  echo
+  echo "Waybar options:"
+  echo " -n           Make waybar text start with a new line if not muted"
+  echo " -d           Use db level insteaf of percentage for text"
   echo
   echo "Commands:"
   echo " volume-up INC   Raise the volume with optional INC"
@@ -71,12 +75,14 @@ print_waybar_json()
 {
   master="$(amixer $amixer_opts sget "$control"| tail -1)"
   percentage="$(grep -o "[0-9]*%" <<< "$master")"
+  db_level="$(grep -o "[0-9.-]*dB" <<< "$master")"
   if grep -q "\[off\]$" <<< "$master" ; then
     text=""
     alt="muted"
     class="muted"
   else
-    $text_newline && text="\n$percentage" || text="$percentage"
+    $text_newline && text="\n" || text=""
+    $use_db_level && text+="$db_level" || text="$percentage"
     alt="default"
     class="default"
   fi
@@ -97,14 +103,16 @@ amixer_opts="-M"
 control="Master"
 volume_step="2%"
 text_newline=false
+use_db_level=false
 
-while getopts "c:D:C:i:nh" opt ; do
+while getopts "c:D:C:i:ndh" opt ; do
   case "$opt" in
     c) amixer_opts+=" -c $OPTARG";;
     D) amixer_opts+=" -D $OPTARG";;
     C) control="$OPTARG";;
     i) increment="$OPTARG";;
     n) text_newline=true;;
+    d) use_db_level=true;;
     h) usage ; exit 0 ;;
     ?) echo "$script_name: invalid option -$opt"
        echo "Try '$script_name -h' for more information."
