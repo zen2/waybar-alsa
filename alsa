@@ -97,10 +97,10 @@ print_waybar_json()
 }
 
 waybar_loop() {
-  local dummy
+  local event
   print_waybar_json
-  alsactl monitor | while read dummy ; do
-    print_waybar_json
+  alsactl monitor | while read event ; do
+    grep -qE ",$control (Playback|Capture)" <<< "$event" && print_waybar_json
   done
 }
 
