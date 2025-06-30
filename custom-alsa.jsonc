@@ -7,7 +7,7 @@
          "muted": "",             // icon: volume-xmark
          "default": ["","",""]  // icons: volume-off, volume-low, volume-high 
        },
-       "tooltip": false,
+       "tooltip": true,
        "on-click": "qasmixer &",
        "on-click-middle": "$HOME/.config/waybar/scripts/alsa toggle",
        "on-scroll-up": "$HOME/.config/waybar/scripts/alsa volume-up",
@@ -15,14 +15,14 @@
     },
     "custom/mic": {
        "exec": "$HOME/.config/waybar/scripts/alsa -C Mic -n waybar-exec",
-       "exec-on-event": false,
+       "exec-on-event": true,
        "return-type": "json",
        "format" : "<span size='120%'>{icon}</span><span size='70%'>{text}</span>",
        "format-icons": {
          "muted": "",              // icon: microphone-lines-slash 
          "default": ""             // icon: microphone-lines
        },
-       "tooltip": false,
+       "tooltip": true,
        "on-click": "qasmixer &",
        "on-click-middle": "$HOME/.config/waybar/scripts/alsa -C Mic toggle",
        "on-click-right": "$HOME/.config/waybar/scripts/alsa -C 'Mic Boost (+20dB)' toggle",
