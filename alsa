@@ -76,6 +76,8 @@ list_controls() {
 
 print_waybar_json()
 {
+  local master percentage db_level
+  local text alt class tooltip
   master="$(amixer $amixer_opts sget "$control"| tail -1)"
   percentage="$(grep -o "[0-9]*%" <<< "$master")"
   db_level="$(grep -o "[0-9.-]*dB" <<< "$master")"
@@ -83,14 +85,15 @@ print_waybar_json()
     text=""
     alt="muted"
     class="muted"
+    tooltip="$control muted"
   else
     $text_newline && text="\n" || text=""
     $use_db_level && text+="$db_level" || text="$percentage"
     alt="default"
     class="default"
+    tooltip="$control $percentage $db_level"
   fi
-  tooltip="$text"
-  echo "{\"text\": \"$text\", \"alt\": \"$alt\", \"tooltip\": \"$text\", \"class\": \"$class\", \"percentage\": ${percentage%\%} }"
+  echo "{\"text\": \"$text\", \"alt\": \"$alt\", \"tooltip\": \"$tooltip\", \"class\": \"$class\", \"percentage\": ${percentage%\%} }"
 }
 
 waybar_loop() {
