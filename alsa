@@ -12,47 +12,54 @@
 # 20250630 db level option, tooltip, loop optimization
 #
 script_name="$(basename $0)"
+
 usage() {
-  echo "$script_name [OPTION]... volume-up [INC]|volume-down [INC]|mute|unmute|toggle"
-  echo "$script_name [OPTION]... on|off|toggle|set VALUE|waybar-exec"
-  echo "$script_name [OPTION]... list-cards|list-devices|list-controls"
-  echo
-  echo "Alsa options:"
-  echo " -c card      Select the alsa card by number or name"
-  echo "                List: $script_name list-cards"
-  echo "                Ex:   2|NVidia|PCH|Device" 
-  echo " -D device    Select the alsa device instead of the default one"
-  echo "                List: $script_name list-devices"
-  echo "                Ex:   hdmi:CARD=NVidia,DEV=0 "
-  echo " -C control   Select the mixer control. Default to Master"
-  echo "                List: $script_name list-controls"
-  echo "                Ex: Mic|Line|Aux"
-  echo
-  echo "Waybar options:"
-  echo " -n           Make waybar text start with a new line if not muted"
-  echo " -d           Use db level instead of percentage for text"
-  echo
-  echo "Commands:"
-  echo " volume-up INC   Raise the volume with optional INC"
-  echo " volume-down INC Decrease the volume with optional INCof INC"
-  echo "                 INC set the volume step: [0-9]% or [0-9]dB (default to 2%)"
-  echo " mute|off        Mute or set to off"
-  echo " unmute|on       Unmute or set to on"
-  echo " toggle          Toggle mute|unmute or on|off"
-  echo " set VALUE       Set control to VALUE"
-  echo " waybar-exec     To use for exec command of a waybar custom module"
-  echo
-  echo "Alsa list commands:"
-  echo " list-cards    list number/name of alsa cards to be used with -c option"
-  echo " list-devices  list alsa devices to be used with -D option"
-  echo " list-controls list alsa controls of default or selected (-c) card to be used with -C option"
-  echo
-  echo "Examples:"
-  echo " $script_name -c 2 list-controls"
-  echo " $script_name volume-up 2dB"
-  echo " $script_name -c STX -C Mic mute"
-  echo " $script_name -C 'Mic Boost (+20dB)' toggle"
-  echo " $script_name -C Analog Output' set Headphones"
+  cat <<EOF
+$script_name [OPTION]... volume-up [INC]|volume-down [INC]|mute|unmute|toggle
+$script_name [OPTION]... on|off|toggle|set VALUE|waybar-exec
+$script_name [OPTION]... list-cards|list-devices|list-controls
+
+Alsa options:"
+ -c card      Select the alsa card by number or name"
+                List: $script_name list-cards"
+                Ex:   2|NVidia|PCH|Device" 
+ -D device    Select the alsa device instead of the default one"
+                List: $script_name list-devices"
+                Ex:   hdmi:CARD=NVidia,DEV=0 "
+ -C control   Select the mixer control. Default to Master"
+                List: $script_name list-controls"
+                Ex: Mic|Line|Aux"
+
+Waybar options:
+ -n           Make waybar text start with a new line if not muted
+ -d           Use db level instead of percentage for text
+
+Commands:
+ volume-up INC   Raise the volume with optional INC
+ volume-down INC Decrease the volume with optional INCof INC
+                 INC set the volume step: [0-9]% or [0-9]dB (default to 2%)
+ mute|off        Mute or set to off
+ unmute|on       Unmute or set to on
+ toggle          Toggle mute|unmute or on|off
+ set VALUE       Set control to VALUE
+ waybar-exec     To use for exec command of a waybar custom module
+
+waybar-exec options:
+ -n           Make waybar text start with a new line if not muted
+ -d           Use db level instead of percentage for text
+
+Alsa list commands:
+ list-cards    list number/name of alsa cards to be used with -c option
+ list-devices  list alsa devices to be used with -D option
+ list-controls list alsa controls of default or selected (-c) card to be used with -C option
+
+Examples:
+ $script_name -c 2 list-controls
+ $script_name volume-up 2dB
+ $script_name -c STX -C Mic mute
+ $script_name -C 'Mic Boost (+20dB)' toggle
+ $script_name -C Analog Output' set Headphones
+EOF
 }
 
 list_controls() {
